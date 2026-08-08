@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Flame, Droplets, Menu, X } from 'lucide-react';
+import { Flame, Droplets, MoreVertical, X } from 'lucide-react';
 import { generateWhatsAppContactLink } from '../utils/whatsapp';
 
 export function Header() {
@@ -25,7 +25,7 @@ export function Header() {
             onClick={() => setIsMenuOpen(true)}
             className="p-2 -ml-2 text-textMuted hover:text-primary transition-colors"
           >
-            <Menu className="w-6 h-6" />
+            <MoreVertical className="w-6 h-6" />
           </button>
         </div>
 

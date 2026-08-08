@@ -193,7 +193,8 @@ export function OrderForm() {
                   >
                     <div className="flex flex-col items-center gap-2 mb-3">
                       <Flame className={`w-8 h-8 ${selectedTypes.gas ? 'text-primary' : 'text-textMuted'}`} />
-                      <span className="font-medium text-lg">Gás</span>
+                      <span className="font-medium text-lg">Gás 13Kg</span>
+                      <span className="text-xs text-textMuted text-center">Entrega: R$ 130,00<br/>Retirada: R$ 125,00</span>
                     </div>
                     {selectedTypes.gas && (
                       <div className="flex items-center justify-center gap-4 bg-background rounded-xl p-2" onClick={e => e.stopPropagation()}>
@@ -213,7 +214,8 @@ export function OrderForm() {
                   >
                     <div className="flex flex-col items-center gap-2 mb-3">
                       <Droplets className={`w-8 h-8 ${selectedTypes.agua ? 'text-blue-400' : 'text-textMuted'}`} />
-                      <span className="font-medium text-lg">Água</span>
+                      <span className="font-medium text-lg">Água 20L</span>
+                      <span className="text-xs text-textMuted text-center">R$ 20,00</span>
                     </div>
                     {selectedTypes.agua && (
                       <div className="flex items-center justify-center gap-4 bg-background rounded-xl p-2" onClick={e => e.stopPropagation()}>

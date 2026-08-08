@@ -1,4 +1,4 @@
-import { Flame, Droplets } from 'lucide-react';
+import { Flame, Droplets, Mail } from 'lucide-react';
 
 export function Footer() {
   return (
@@ -16,8 +16,14 @@ export function Footer() {
           Rapidez, qualidade e confiança no seu atendimento.
         </p>
         
-        <div className="bg-surface/50 px-4 py-2 rounded-full border border-white/10 mb-10 text-primary font-medium tracking-wide">
-          (45) 99957-1858
+        <div className="flex flex-col items-center gap-3 mb-10">
+          <div className="bg-surface/50 px-4 py-2 rounded-full border border-white/10 text-primary font-medium tracking-wide">
+            (45) 99957-1858
+          </div>
+          <div className="flex items-center gap-2 text-textMuted hover:text-white transition-colors">
+            <Mail className="w-4 h-4" />
+            <a href="mailto:gasibema@hotma.com">gasibema@hotma.com</a>
+          </div>
         </div>
         
         <div className="w-full border-t border-white/5 pt-6 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-textMuted/60">

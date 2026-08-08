@@ -9,8 +9,8 @@ export default {
       colors: {
         background: '#121212',
         surface: '#1E1E1E',
-        primary: '#EAB308', // Dourado/Amarelo forte
-        primaryHover: '#CA8A04',
+        primary: '#F97316', // Laranja (identidade das imagens)
+        primaryHover: '#EA580C',
         text: '#F3F4F6',
         textMuted: '#9CA3AF',
         whatsapp: '#25D366',

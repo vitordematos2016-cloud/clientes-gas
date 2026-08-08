@@ -16,20 +16,16 @@ export function Hero() {
       
       <div className="relative z-10 max-w-4xl mx-auto flex flex-col items-center animate-fade-in">
         
-        <div className="inline-flex items-center gap-2 bg-surface border border-primary/20 px-4 py-2 rounded-full mb-8 shadow-lg shadow-primary/5">
-          <span className="flex h-2 w-2 rounded-full bg-primary animate-pulse"></span>
-          <span className="text-sm font-medium text-primary tracking-wide uppercase">Agora sob nova direção</span>
-        </div>
 
         <h1 className="text-5xl md:text-7xl font-extrabold tracking-tight mb-6 leading-tight">
-          Precisou de gás ou água? <br />
-          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-yellow-200">
-            Peça em segundos.
+          Seu gás acabou? <br />
+          <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
+            É só chamar que levamos até você.
           </span>
         </h1>
         
         <p className="text-lg md:text-xl text-textMuted max-w-2xl mb-12">
-          Informe seus dados, escolha seu pedido e envie diretamente para o nosso WhatsApp. Simples, rápido e sem burocracia.
+          Afinal, o seu almoço e janta não podem ficar esperando. Informe seus dados, escolha seu pedido e receba na porta da sua casa.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">

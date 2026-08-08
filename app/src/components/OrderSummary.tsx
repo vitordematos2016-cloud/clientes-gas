@@ -41,7 +41,7 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
         </div>
         
         <div>
-          <span className="text-textMuted text-sm block mb-1">Pedido</span>
+          <span className="text-textMuted text-sm block mb-1">Pedido ({data.deliveryMethod === 'entrega' ? 'Entrega' : 'Retirar no local'})</span>
           <div className="font-medium">
             {data.itens.map((i, idx) => (
               <div key={idx}>{i.quantidade}x {i.tipo === 'gas' ? 'Gás' : 'Água'}</div>
@@ -49,17 +49,20 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
           </div>
         </div>
         
-        <div>
-          <span className="text-textMuted text-sm block mb-1">Endereço</span>
-          <span className="font-medium block">{data.endereco}, {data.numero} - {data.bairro}</span>
-          <span className="font-medium block">{data.cidade} - {data.estado}</span>
-          {data.referencia && <span className="text-sm text-textMuted mt-1 block">Ref: {data.referencia}</span>}
-          {data.locationLink && (
-            <span className="text-sm text-whatsapp mt-2 flex items-center gap-1 font-medium bg-whatsapp/10 w-fit px-2 py-1 rounded-md">
-              <CheckCircle2 className="w-4 h-4" /> Localização exata do mapa incluída
-            </span>
-          )}
-        </div>
+        {data.deliveryMethod === 'entrega' && (
+          <div>
+            <span className="text-textMuted text-sm block mb-1">Endereço</span>
+            <span className="font-medium block">{data.endereco}, {data.numero} - {data.bairro}</span>
+            <span className="font-medium block">{data.cidade} - {data.estado}</span>
+            {data.tipoLocal && <span className="text-sm text-textMuted mt-1 block">Tipo de Imóvel: {data.tipoLocal}</span>}
+            {data.referencia && <span className="text-sm text-textMuted mt-1 block">Ref: {data.referencia}</span>}
+            {data.locationLink && (
+              <span className="text-sm text-whatsapp mt-2 flex items-center gap-1 font-medium bg-whatsapp/10 w-fit px-2 py-1 rounded-md">
+                <CheckCircle2 className="w-4 h-4" /> Localização exata do mapa incluída
+              </span>
+            )}
+          </div>
+        )}
         
         <div>
           <span className="text-textMuted text-sm block mb-1">Pagamento</span>
@@ -68,6 +71,11 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
               ? `Dinheiro (Troco para R$ ${data.pagamento.trocoPara})` 
               : data.pagamento.metodo}
           </span>
+        </div>
+
+        <div className="pt-4 border-t border-white/10 flex justify-between items-center">
+          <span className="text-lg font-bold">Total Estimado</span>
+          <span className="text-2xl font-bold text-primary">R$ {data.total.toFixed(2).replace('.', ',')}</span>
         </div>
       </div>
 

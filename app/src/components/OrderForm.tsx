@@ -36,6 +36,8 @@ export function OrderForm() {
   const [trocoPara, setTrocoPara] = useState('');
   
   const [observacao, setObservacao] = useState('');
+  const [deliveryMethod, setDeliveryMethod] = useState<'entrega' | 'retirada'>('entrega');
+  const [tipoLocal, setTipoLocal] = useState('Casa');
 
   // Listener para o botão do Hero
   useEffect(() => {
@@ -72,7 +74,7 @@ export function OrderForm() {
       setErrorMsg('Selecione ao menos 1 produto.');
       return;
     }
-    if (!endereco.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado.trim()) {
+    if (deliveryMethod === 'entrega' && (!endereco.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado.trim())) {
       setErrorMsg('Preencha seu endereço completo (Rua, Número, Bairro, Cidade e Estado).');
       return;
     }
@@ -138,15 +140,31 @@ export function OrderForm() {
   const searchString = [endereco, numero, bairro, cidade, estado, referencia].filter(Boolean).join(' ');
   const finalLocationLink = locationLink || (endereco.trim() ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(searchString)}` : undefined);
 
+  const calculateTotal = () => {
+    let total = 0;
+    if (selectedTypes.gas) {
+      total += quantities.gas * (deliveryMethod === 'entrega' ? 130 : 125);
+    }
+    if (selectedTypes.agua) {
+      total += quantities.agua * 20;
+    }
+    return total;
+  };
+
+  const totalPedido = calculateTotal();
+
   const orderData: OrderData = {
     nome,
     telefone,
+    deliveryMethod,
+    tipoLocal,
     endereco,
     numero,
     bairro,
     cidade,
     estado,
     referencia,
+    locationLink: finalLocationLink,
     itens: (['gas', 'agua'] as OrderItemType[])
       .filter(t => selectedTypes[t])
       .map(t => ({ tipo: t, quantidade: quantities[t] })),
@@ -156,7 +174,7 @@ export function OrderForm() {
       trocoPara
     },
     observacao,
-    locationLink: finalLocationLink
+    total: totalPedido
   };
 
   return (
@@ -250,12 +268,35 @@ export function OrderForm() {
                 </div>
               </div>
 
-              {/* ENDEREÇO */}
+              {/* TIPO DE ENTREGA E ENDEREÇO */}
               <div className="space-y-4">
-                <div className="flex items-center justify-between">
+                <label className="text-lg font-bold flex items-center gap-2">
+                  <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
+                  Retirar no local ou Entrega?
+                </label>
+                
+                <div className="grid grid-cols-2 gap-4 mb-4">
+                  <button 
+                    type="button"
+                    onClick={() => setDeliveryMethod('entrega')}
+                    className={`p-3 rounded-xl border font-medium transition-colors ${deliveryMethod === 'entrega' ? 'border-primary bg-primary/10 text-primary' : 'border-white/10 hover:border-white/30 text-textMuted'}`}
+                  >
+                    Entrega (R$ 130 Gás)
+                  </button>
+                  <button 
+                    type="button"
+                    onClick={() => setDeliveryMethod('retirada')}
+                    className={`p-3 rounded-xl border font-medium transition-colors ${deliveryMethod === 'retirada' ? 'border-primary bg-primary/10 text-primary' : 'border-white/10 hover:border-white/30 text-textMuted'}`}
+                  >
+                    Retirar no local (R$ 125 Gás)
+                  </button>
+                </div>
+
+                {deliveryMethod === 'entrega' && (
+                  <>
+                <div className="flex items-center justify-between mt-4">
                   <label className="text-lg font-bold flex items-center gap-2">
-                    <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">3</span>
-                    Onde entregar?
+                    Endereço de Entrega
                   </label>
                   <button 
                     type="button"
@@ -290,7 +331,17 @@ export function OrderForm() {
                       className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
-                  <div className="grid md:grid-cols-2 gap-4">
+                  <div className="grid md:grid-cols-3 gap-4">
+                    <select
+                      value={tipoLocal}
+                      onChange={e => setTipoLocal(e.target.value)}
+                      className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors text-white"
+                    >
+                      <option value="Casa">Casa</option>
+                      <option value="Apartamento">Apartamento</option>
+                      <option value="Comércio">Comércio/Empresa</option>
+                      <option value="Outro">Outro</option>
+                    </select>
                     <input 
                       type="text" 
                       placeholder="Bairro (Obrigatório)" 
@@ -302,7 +353,7 @@ export function OrderForm() {
                       placeholder="Ponto de referência (Opcional)" 
                       value={referencia}
                       onChange={e => setReferencia(e.target.value)}
-                      className="bg-transparent border border-white/10 rounded-lg px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-full placeholder:text-white/30"
+                      className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors"
                     />
                   </div>
                   <div className="grid grid-cols-[2fr_1fr] gap-4">
@@ -323,6 +374,8 @@ export function OrderForm() {
                     />
                   </div>
                 </div>
+                  </>
+                )}
               </div>
 
               {/* PAGAMENTO */}
@@ -400,6 +453,12 @@ export function OrderForm() {
                   {errorMsg}
                 </div>
               )}
+
+              {/* TOTAL */}
+              <div className="bg-primary/10 border border-primary/20 rounded-xl p-4 flex justify-between items-center">
+                <span className="font-bold text-lg text-primary">Total Estimado:</span>
+                <span className="font-bold text-2xl text-primary">R$ {totalPedido.toFixed(2).replace('.', ',')}</span>
+              </div>
 
               {/* BOTÃO REVISAR */}
               <button 

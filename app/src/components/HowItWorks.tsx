@@ -5,17 +5,17 @@ export function HowItWorks() {
     {
       icon: <MousePointerClick className="w-8 h-8 text-primary" />,
       title: "1. Escolha seu pedido",
-      description: "Gás, água ou os dois."
+      description: "Chame no WhatsApp"
     },
     {
       icon: <MapPin className="w-8 h-8 text-primary" />,
-      title: "2. Informe onde entregar",
-      description: "Preencha seu endereço rapidamente."
+      title: "2. Informe o endereço",
+      description: "Pelo nosso formulário prático"
     },
     {
       icon: <Send className="w-8 h-8 text-primary" />,
-      title: "3. Envie pelo WhatsApp",
-      description: "Seu pedido chega organizado para nossa equipe."
+      title: "3. Receba em casa",
+      description: "Entrega rápida garantida"
     }
   ];
 
@@ -23,8 +23,8 @@ export function HowItWorks() {
     <section id="how-it-works" className="py-24 px-4 relative">
       <div className="max-w-5xl mx-auto">
         <div className="text-center mb-16">
-          <h2 className="text-3xl md:text-4xl font-bold mb-4">Como funciona?</h2>
-          <p className="text-textMuted">Três passos simples para receber seu pedido.</p>
+          <h2 className="text-3xl md:text-4xl font-bold mb-4 uppercase italic">Como Pedir?</h2>
+          <p className="text-textMuted text-xl font-medium">É simples!</p>
         </div>
 
         <div className="grid md:grid-cols-3 gap-6 relative">

@@ -13,9 +13,13 @@ export interface PaymentDetails {
   trocoPara?: string;
 }
 
+export type DeliveryMethod = 'entrega' | 'retirada';
+
 export interface OrderData {
   nome: string;
   telefone?: string;
+  deliveryMethod: DeliveryMethod;
+  tipoLocal?: string;
   endereco: string;
   numero: string;
   bairro: string;
@@ -26,4 +30,5 @@ export interface OrderData {
   itens: OrderItem[];
   pagamento: PaymentDetails;
   observacao?: string;
+  total: number;
 }

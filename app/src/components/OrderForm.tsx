@@ -317,7 +317,7 @@ export function OrderForm() {
                 )}
 
                 <div className="space-y-4">
-                  <div className="grid grid-cols-[2fr_1fr] gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
                     <input 
                       type="text" 
                       placeholder="Rua/Avenida (Obrigatório)" 
@@ -331,7 +331,7 @@ export function OrderForm() {
                       className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors"
                     />
                   </div>
-                  <div className="grid md:grid-cols-3 gap-4">
+                  <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
                     <select
                       value={tipoLocal}
                       onChange={e => setTipoLocal(e.target.value)}
@@ -356,7 +356,7 @@ export function OrderForm() {
                       className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors"
                     />
                   </div>
-                  <div className="grid grid-cols-[2fr_1fr] gap-4">
+                  <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
                     <input 
                       type="text" 
                       placeholder="Cidade (Obrigatório)" 

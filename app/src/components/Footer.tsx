@@ -1,4 +1,4 @@
-import { Flame, Droplets, Mail } from 'lucide-react';
+import { Flame, Droplets, Mail, Clock, MapPin } from 'lucide-react';
 import { generateWhatsAppContactLink } from '../utils/whatsapp';
 
 export function Footer() {
@@ -13,9 +13,26 @@ export function Footer() {
           <span className="text-2xl font-bold">Gás do Nego</span>
         </div>
         
-        <p className="text-textMuted max-w-sm mb-6">
+        <p className="text-textMuted max-w-sm mb-10">
           Rapidez, qualidade e confiança no seu atendimento.
         </p>
+
+        {/* Informações de Atendimento */}
+        <div className="flex flex-col md:flex-row items-center justify-center gap-8 mb-10 w-full max-w-2xl bg-surface/30 p-6 rounded-2xl border border-white/5">
+          <div className="flex flex-col items-center text-center gap-2 flex-1">
+            <Clock className="w-6 h-6 text-primary mb-1" />
+            <span className="font-bold text-white">Horário de Funcionamento</span>
+            <span className="text-sm text-textMuted">Seg a Sáb: 08h às 20h<br/>Dom e Feriados: 08h às 14h</span>
+          </div>
+          
+          <div className="hidden md:block w-px h-16 bg-white/10"></div>
+          
+          <div className="flex flex-col items-center text-center gap-2 flex-1">
+            <MapPin className="w-6 h-6 text-primary mb-1" />
+            <span className="font-bold text-white">Área de Entrega</span>
+            <span className="text-sm text-textMuted">Atendemos toda a cidade<br/>e bairros da região</span>
+          </div>
+        </div>
         
         <div className="flex flex-col items-center gap-3 mb-10">
           <a 

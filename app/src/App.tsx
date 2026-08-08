@@ -3,6 +3,7 @@ import { Hero } from './components/Hero';
 import { OrderForm } from './components/OrderForm';
 import { HowItWorks } from './components/HowItWorks';
 import { Benefits } from './components/Benefits';
+import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
 
@@ -16,6 +17,7 @@ function App() {
         <HowItWorks />
         <OrderForm />
         <Benefits />
+        <FAQ />
       </main>
 
       <Footer />

@@ -12,12 +12,7 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
   const [isSending, setIsSending] = useState(false);
 
   const handleSend = () => {
-    setIsSending(true);
-    setTimeout(() => {
-      window.location.href = generateWhatsAppLink(data);
-      // Fallback para abrir numa nova aba se a mesma janela não suportar (embora a mesma janela seja ideal para deep linking)
-      // window.open(generateWhatsAppLink(data), '_blank'); 
-    }, 1500);
+    // Não precisa mais do timeout, a tag <a> nativa cuida disso no mobile
   };
 
   if (isSending) {
@@ -88,13 +83,16 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
           Editar informações
         </button>
         
-        <button 
-          onClick={handleSend}
+        <a 
+          href={generateWhatsAppLink(data)}
+          target="_blank"
+          rel="noopener noreferrer"
+          onClick={() => setIsSending(true)}
           className="flex-[2] bg-whatsapp hover:bg-whatsappHover text-white px-6 py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 font-bold shadow-lg shadow-whatsapp/20"
         >
           <Send className="w-5 h-5" />
           Enviar pedido pelo WhatsApp
-        </button>
+        </a>
       </div>
     </div>
   );

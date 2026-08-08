@@ -88,6 +88,7 @@ export function OrderForm() {
     }
 
     setErrorMsg('');
+    document.getElementById('order-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     setStep('summary');
   };
 
@@ -184,7 +185,10 @@ export function OrderForm() {
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
         
         {step === 'summary' ? (
-          <OrderSummary data={orderData} onEdit={() => setStep('form')} />
+          <OrderSummary data={orderData} onEdit={() => {
+            setStep('form');
+            document.getElementById('order-section')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+          }} />
         ) : (
           <div className="animate-slide-up">
             <div className="text-center mb-8">
@@ -381,7 +385,7 @@ export function OrderForm() {
               {/* PAGAMENTO */}
               <div className="space-y-4">
                 <label className="text-lg font-bold flex items-center gap-2">
-                  <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">4</span>
+                  <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">{deliveryMethod === 'entrega' ? '4' : '3'}</span>
                   Como deseja pagar?
                 </label>
                 <div className="grid grid-cols-3 gap-3">
@@ -433,17 +437,37 @@ export function OrderForm() {
                 )}
               </div>
 
-              {/* OBSERVAÇÃO */}
+              {/* OBSERVAÇÃO OU ENDEREÇO DE RETIRADA */}
               <div className="space-y-4">
                 <label className="text-lg font-bold flex items-center gap-2">
-                  <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">5</span>
-                  Observação (Opcional)
+                  <span className="bg-primary/20 text-primary w-6 h-6 rounded-full flex items-center justify-center text-sm">{deliveryMethod === 'entrega' ? '5' : '4'}</span>
+                  {deliveryMethod === 'entrega' ? 'Observação (Opcional)' : 'Endereço de Retirada'}
                 </label>
-                <textarea 
-                  placeholder="Ex.: chamar no portão, deixar com o vizinho..." 
-                  value={observacao} onChange={e => setObservacao(e.target.value)}
-                  className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors min-h-[100px] resize-none"
-                />
+                
+                {deliveryMethod === 'entrega' ? (
+                  <textarea 
+                    placeholder="Ex.: chamar no portão, deixar com o vizinho..." 
+                    value={observacao} onChange={e => setObservacao(e.target.value)}
+                    className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 focus:outline-none focus:border-primary transition-colors min-h-[100px] resize-none"
+                  />
+                ) : (
+                  <div className="bg-surface/50 border border-white/5 rounded-xl p-6 text-center space-y-3">
+                    <MapPin className="w-8 h-8 text-primary mx-auto mb-2" />
+                    <h4 className="font-bold text-lg text-white">Gás do Nego</h4>
+                    <p className="text-textMuted">
+                      Rua Exemplo, 123 - Bairro Centro<br/>
+                      Sua Cidade - PR, 80000-000
+                    </p>
+                    <a 
+                      href="#" 
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-block mt-2 text-primary font-medium hover:text-primaryHover transition-colors border-b border-primary/30 pb-0.5"
+                    >
+                      Ver no Google Maps
+                    </a>
+                  </div>
+                )}
               </div>
 
               {/* ERRO VISUAL */}

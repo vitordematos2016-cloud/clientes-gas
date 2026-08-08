@@ -11,9 +11,7 @@ interface OrderSummaryProps {
 export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
   const [isSending, setIsSending] = useState(false);
 
-  const handleSend = () => {
-    // Não precisa mais do timeout, a tag <a> nativa cuida disso no mobile
-  };
+
 
   if (isSending) {
     return (

@@ -13,3 +13,5 @@
 ## Testes e Resultados
 - Build de produção (`npm run build`) concluído com 0 erros de tipagem TypeScript.
 - Rotina dinâmica do WhatsApp gerada corretamente de acordo com o JSON Data Schema.
+- [x] Fase 5: Configuração de CI/CD (GitHub Actions) concluída com deploy automatizado via FTP para subdomínio na Hostinger.
+- [x] Repositório sincronizado com ambiente remoto via Token seguro.

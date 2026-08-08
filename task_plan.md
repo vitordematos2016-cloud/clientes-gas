@@ -13,17 +13,17 @@
   - [ ] Testar conexões de API
   - [ ] Construir scripts de Handshake em `tools/`
 
-- [ ] **Fase 3: A - Arquitetura (A Construção em 3 Camadas)**
-  - [ ] Escrever POPs em `architecture/`
-  - [ ] Construir scripts determinísticos em `tools/`
-  - [ ] Testar fluxo lógico e de dados usando `.tmp/`
+- [x] **Fase 3: A - Arquitetura (A Construção em 3 Camadas)**
+  - [x] Escrever POPs em `architecture/`
+  - [x] Construir scripts determinísticos em `tools/`
+  - [x] Testar fluxo lógico e de dados usando `.tmp/`
 
-- [ ] **Fase 4: E - Estilo (Refinamento e UI)**
-  - [ ] Refinar o Payload de Entrega
-  - [ ] Aplicar UI/UX (se aplicável)
-  - [ ] Validar apresentação com o usuário
+- [x] **Fase 4: E - Estilo (Refinamento e UI)**
+  - [x] Refinar o Payload de Entrega
+  - [x] Aplicar UI/UX (se aplicável)
+  - [x] Validar apresentação com o usuário
 
-- [ ] **Fase 5: G - Gatilho (Implantação)**
-  - [ ] Transferência para Nuvem
-  - [ ] Configurar gatilhos (Cron, Webhooks)
-  - [ ] Finalizar Log de Manutenção em `GEMINI.md`
+- [x] **Fase 5: G - Gatilho (Implantação)**
+  - [x] Transferência para Nuvem (GitHub)
+  - [x] Configurar gatilhos (GitHub Actions para Hostinger)
+  - [x] Finalizar Log de Manutenção em `GEMINI.md`

@@ -33,5 +33,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./app/dist/
-          server-dir: ./
+          server-dir: ./domains/matossolucoes.com/public_html/gas-do-nego/
           dangerous-clean-slate: true

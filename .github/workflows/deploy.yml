@@ -33,5 +33,5 @@ jobs:
           username: ${{ secrets.FTP_USERNAME }}
           password: ${{ secrets.FTP_PASSWORD }}
           local-dir: ./app/dist/
-          server-dir: ./gas-do-nego/
+          server-dir: ./
           dangerous-clean-slate: true

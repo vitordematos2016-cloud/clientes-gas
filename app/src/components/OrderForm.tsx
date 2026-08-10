@@ -453,19 +453,10 @@ export function OrderForm() {
                 ) : (
                   <div className="bg-surface/50 border border-white/5 rounded-xl p-6 text-center space-y-3">
                     <MapPin className="w-8 h-8 text-primary mx-auto mb-2" />
-                    <h4 className="font-bold text-lg text-white">Gás do Nego</h4>
-                    <p className="text-textMuted">
-                      Rua Exemplo, 123 - Bairro Centro<br/>
-                      Sua Cidade - PR, 80000-000
+                    <h4 className="font-bold text-lg text-white">Retirada no Local</h4>
+                    <p className="text-textMuted text-sm">
+                      O endereço exato para retirada e a localização do mapa serão enviados pelo vendedor no WhatsApp assim que você confirmar o pedido.
                     </p>
-                    <a 
-                      href="#" 
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="inline-block mt-2 text-primary font-medium hover:text-primaryHover transition-colors border-b border-primary/30 pb-0.5"
-                    >
-                      Ver no Google Maps
-                    </a>
                   </div>
                 )}
               </div>

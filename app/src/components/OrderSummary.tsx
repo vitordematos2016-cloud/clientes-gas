@@ -1,5 +1,5 @@
 import type { OrderData } from '../types';
-import { Pencil, Send, CheckCircle2 } from 'lucide-react';
+import { Pencil, Send, CheckCircle2, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { generateWhatsAppLink } from '../utils/whatsapp';
 
@@ -18,7 +18,26 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
       <div className="flex flex-col items-center justify-center py-12 text-center animate-fade-in">
         <CheckCircle2 className="w-20 h-20 text-whatsapp mb-4 animate-bounce-soft" />
         <h3 className="text-2xl font-bold mb-2">Pedido pronto!</h3>
-        <p className="text-textMuted max-w-sm">Estamos abrindo o WhatsApp para você finalizar o envio.</p>
+        <p className="text-textMuted max-w-sm mb-6">Estamos abrindo o WhatsApp para você finalizar o envio.</p>
+        
+        {data.deliveryMethod === 'retirada' && (
+          <div className="bg-surface border border-white/10 rounded-xl p-6 text-left w-full max-w-sm animate-slide-up">
+            <h4 className="font-bold text-lg text-primary mb-2 flex items-center gap-2">
+              <span className="bg-primary/20 p-1.5 rounded-lg"><MapPin className="w-5 h-5" /></span>
+              Endereço para Retirada
+            </h4>
+            <p className="text-text mb-1">Rua Exemplo, 123 - Bairro Centro</p>
+            <p className="text-textMuted text-sm mb-4">Sua Cidade - PR, 80000-000</p>
+            <a 
+              href="https://maps.google.com/?q=Rua+Exemplo,+123+-+Bairro+Centro,+Sua+Cidade+-+PR" 
+              target="_blank"
+              rel="noopener noreferrer"
+              className="block w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-center font-medium transition-colors"
+            >
+              Abrir no Google Maps
+            </a>
+          </div>
+        )}
       </div>
     );
   }
@@ -85,7 +104,9 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
           href={generateWhatsAppLink(data)}
           target="_blank"
           rel="noopener noreferrer"
-          onClick={() => setIsSending(true)}
+          onClick={() => {
+            setTimeout(() => setIsSending(true), 150);
+          }}
           className="flex-[2] bg-whatsapp hover:bg-whatsappHover text-white px-6 py-4 rounded-xl transition-all hover:scale-[1.02] active:scale-95 flex items-center justify-center gap-2 font-bold shadow-lg shadow-whatsapp/20"
         >
           <Send className="w-5 h-5" />

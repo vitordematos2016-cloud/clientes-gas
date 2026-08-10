@@ -1,6 +1,6 @@
 import type { OrderData } from '../types';
 
-export const WHATSAPP_NUMBER = '5545999571858';
+export const WHATSAPP_NUMBER = '5545933005119';
 
 export function formatWhatsAppMessage(data: OrderData): string {
   const itemsText = data.itens
@@ -13,7 +13,7 @@ export function formatWhatsAppMessage(data: OrderData): string {
     `Dinheiro${data.pagamento.precisaTroco ? ` (Troco para R$ ${data.pagamento.trocoPara})` : ' (Sem troco)'}`;
 
   const messageParts = [
-    `🔥 *NOVO PEDIDO — GÁS DO NEGO*`,
+    `🔥 *NOVO PEDIDO*`,
     `Olá! Gostaria de fazer um pedido.`,
     `\n👤 *Nome:* ${data.nome}`
   ];
@@ -52,7 +52,7 @@ export function formatWhatsAppMessage(data: OrderData): string {
     messageParts.push(`\n📝 *Observação:*\n${data.observacao}`);
   }
 
-  messageParts.push(`\n_Pedido realizado pelo site do Gás do Nego._`);
+  messageParts.push(`\n_Pedido realizado pelo site._`);
 
   return messageParts.join('\n');
 }
@@ -63,6 +63,6 @@ export function generateWhatsAppLink(data: OrderData): string {
 }
 
 export function generateWhatsAppContactLink(): string {
-  const message = 'Olá! Vim pelo site do Gás do Nego e gostaria de atendimento.';
+  const message = 'Olá! Vim pelo site e gostaria de atendimento.';
   return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
 }

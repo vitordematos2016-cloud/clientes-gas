@@ -30,14 +30,14 @@ export function Hero() {
         </div>
 
         <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-tight drop-shadow-2xl">
-          Seu gás acabou? <br />
+          Ficou sem gás ou água? <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
-            É só chamar que levamos até você.
+            Peça agora e receba em minutos.
           </span>
         </h1>
         
         <p className="text-lg md:text-xl text-textMuted max-w-2xl mb-12">
-          Afinal, o seu almoço e janta não podem ficar esperando. Informe seus dados, escolha seu pedido e receba na porta da sua casa.
+          Não deixe sua rotina parar. Faça seu pedido em poucos cliques e garanta a entrega mais rápida e segura da região diretamente na sua casa.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">

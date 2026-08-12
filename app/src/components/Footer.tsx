@@ -41,15 +41,15 @@ export function Footer() {
             rel="noopener noreferrer"
             className="bg-surface/50 px-4 py-2 rounded-full border border-white/10 text-primary font-medium tracking-wide hover:bg-surface transition-colors cursor-pointer"
           >
-            45 99957-1858
+            45 93300-5119
           </a>
           <div className="flex items-center gap-6 text-textMuted">
             <a 
-              href="mailto:gasibema@hotma.com" 
+              href="mailto:contato@seusite.com.br" 
               className="flex items-center gap-2 hover:text-white transition-colors"
             >
               <Mail className="w-4 h-4" />
-              <span>gasibema@hotma.com</span>
+              <span>contato@seusite.com.br</span>
             </a>
             <a 
               href="#" 

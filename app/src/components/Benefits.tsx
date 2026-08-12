@@ -3,7 +3,7 @@ import { Zap, Map, MessageSquare, Flame, Droplets, ShieldCheck } from 'lucide-re
 export function Benefits() {
   const benefits = [
     { icon: <Zap className="w-6 h-6 text-primary" />, title: "Entrega Rápida" },
-    { icon: <Map className="w-6 h-6 text-primary" />, title: "Ibema e Região" },
+    { icon: <Map className="w-6 h-6 text-primary" />, title: "Sua Região" },
     { icon: <MessageSquare className="w-6 h-6 text-primary" />, title: "Preço Justo" },
     { icon: <Flame className="w-6 h-6 text-primary" />, title: "Gás de Cozinha" },
     { icon: <Droplets className="w-6 h-6 text-blue-400" />, title: "Água Mineral" },

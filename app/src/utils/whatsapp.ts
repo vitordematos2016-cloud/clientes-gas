@@ -39,6 +39,10 @@ export function formatWhatsAppMessage(data: OrderData): string {
       messageParts.push(`📌 *Referência:*\n${data.referencia}`);
     }
 
+    if (data.tempoEntrega) {
+      messageParts.push(`⏰ *Quando Entregar:* ${data.tempoEntrega}`);
+    }
+
     if (data.locationLink) {
       messageParts.push(`🗺️ *Localização Exata no Mapa:*\n${data.locationLink}`);
     }

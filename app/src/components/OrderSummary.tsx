@@ -68,6 +68,7 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
             <span className="font-medium block">{data.cidade} - {data.estado}</span>
             {data.tipoLocal && <span className="text-sm text-textMuted mt-1 block">Tipo de Imóvel: {data.tipoLocal}</span>}
             {data.referencia && <span className="text-sm text-textMuted mt-1 block">Ref: {data.referencia}</span>}
+            {data.tempoEntrega && <span className="text-sm text-textMuted mt-1 block text-primary">Quando entregar: {data.tempoEntrega}</span>}
             {data.locationLink && (
               <span className="text-sm text-whatsapp mt-2 flex items-center gap-1 font-medium bg-whatsapp/10 w-fit px-2 py-1 rounded-md">
                 <CheckCircle2 className="w-4 h-4" /> Localização exata do mapa incluída

@@ -19,6 +19,7 @@ export interface OrderData {
   nome: string;
   telefone?: string;
   deliveryMethod: DeliveryMethod;
+  tempoEntrega?: string;
   tipoLocal?: string;
   endereco: string;
   numero: string;

@@ -38,6 +38,8 @@ export function OrderForm() {
   const [observacao, setObservacao] = useState('');
   const [deliveryMethod, setDeliveryMethod] = useState<'entrega' | 'retirada'>('entrega');
   const [tipoLocal, setTipoLocal] = useState('Casa');
+  const [tempoEntrega, setTempoEntrega] = useState('Assim que possível');
+  const [tempoEntregaPersonalizado, setTempoEntregaPersonalizado] = useState('');
 
   // Listener para o botão do Hero
   useEffect(() => {
@@ -158,6 +160,7 @@ export function OrderForm() {
     nome,
     telefone,
     deliveryMethod,
+    tempoEntrega: deliveryMethod === 'entrega' ? (tempoEntrega === 'Agendar horário' ? tempoEntregaPersonalizado : tempoEntrega) : undefined,
     tipoLocal,
     endereco,
     numero,
@@ -376,6 +379,30 @@ export function OrderForm() {
                       maxLength={2}
                       className="bg-transparent border border-white/10 rounded-lg px-4 py-3 outline-none focus:border-primary focus:ring-1 focus:ring-primary transition-all w-full placeholder:text-white/30"
                     />
+                  </div>
+                  <div className="space-y-2 mt-4 pt-4 border-t border-white/10">
+                    <label className="text-sm font-bold block mb-2">Quando deseja receber?</label>
+                    <select
+                      value={tempoEntrega}
+                      onChange={e => setTempoEntrega(e.target.value)}
+                      className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 outline-none focus:border-primary transition-colors text-white"
+                    >
+                      <option value="Assim que possível">Assim que possível</option>
+                      <option value="Com urgência">Com urgência</option>
+                      <option value="Agendar horário">Agendar horário</option>
+                    </select>
+                    {tempoEntrega === 'Agendar horário' && (
+                      <input 
+                        type="text" 
+                        placeholder="Ex: Hoje às 18:00, trazer amanhã cedo..." 
+                        value={tempoEntregaPersonalizado}
+                        onChange={e => setTempoEntregaPersonalizado(e.target.value)}
+                        className="w-full bg-surface border border-white/10 rounded-xl px-4 py-3 mt-2 outline-none focus:border-primary transition-colors"
+                      />
+                    )}
+                    <p className="text-xs text-textMuted mt-2 flex items-center gap-1">
+                      * A preferência será anotada, mas está sujeita à disponibilidade no momento da entrega.
+                    </p>
                   </div>
                 </div>
                   </>

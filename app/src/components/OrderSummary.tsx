@@ -55,9 +55,25 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
         <div>
           <span className="text-textMuted text-sm block mb-1">Pedido ({data.deliveryMethod === 'entrega' ? 'Entrega' : 'Retirar no local'})</span>
           <div className="font-medium">
-            {data.itens.map((i, idx) => (
-              <div key={idx}>{i.quantidade}x {i.tipo === 'gas' ? 'Gás' : 'Água'}</div>
-            ))}
+            {data.itens.map((i, idx) => {
+              let unitPrice = 0;
+              if (i.tipo === 'gas') {
+                unitPrice = data.deliveryMethod === 'entrega' ? 130 : 125;
+              } else if (i.tipo === 'agua') {
+                unitPrice = 20;
+              }
+              const itemTotal = unitPrice * i.quantidade;
+              const itemName = i.tipo === 'gas' ? 'Gás' : 'Água';
+              return (
+                <div key={idx} className="flex justify-between items-center border-b border-white/5 pb-2 mb-2 last:border-0 last:pb-0 last:mb-0">
+                  <span>
+                    {i.quantidade}x {itemName} 
+                    <span className="text-xs text-textMuted ml-2">(R$ {unitPrice.toFixed(2).replace('.', ',')}/un)</span>
+                  </span>
+                  <span className="text-primary font-medium">R$ {itemTotal.toFixed(2).replace('.', ',')}</span>
+                </div>
+              );
+            })}
           </div>
         </div>
         

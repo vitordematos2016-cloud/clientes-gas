@@ -4,7 +4,17 @@ export const WHATSAPP_NUMBER = '5545933005119';
 
 export function formatWhatsAppMessage(data: OrderData): string {
   const itemsText = data.itens
-    .map((item) => `${item.quantidade}x ${item.tipo === 'gas' ? 'Gás' : 'Água'}`)
+    .map((item) => {
+      let unitPrice = 0;
+      if (item.tipo === 'gas') {
+        unitPrice = data.deliveryMethod === 'entrega' ? 130 : 125;
+      } else if (item.tipo === 'agua') {
+        unitPrice = 20;
+      }
+      const itemTotal = unitPrice * item.quantidade;
+      const itemName = item.tipo === 'gas' ? 'Gás' : 'Água';
+      return `${item.quantidade}x ${itemName} (R$ ${unitPrice.toFixed(2).replace('.', ',')}/un) = R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
+    })
     .join('\n');
 
   const paymentText = 

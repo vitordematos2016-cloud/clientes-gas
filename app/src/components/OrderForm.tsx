@@ -120,9 +120,10 @@ export function OrderForm() {
             const city = addr.city || addr.town || addr.municipality || '';
             const state = addr.state || addr.province || '';
 
-            if (street) setEndereco(String(street));
-            if (houseNumber) setNumero(String(houseNumber));
-            if (neighborhood) setBairro(String(neighborhood));
+            // Não preenchemos rua e bairro automaticamente pois o mapa costuma errar no interior
+            // if (street) setEndereco(String(street));
+            // if (houseNumber) setNumero(String(houseNumber));
+            // if (neighborhood) setBairro(String(neighborhood));
             if (city) setCidade(String(city));
             if (state) setEstado(String(state));
           }
@@ -140,7 +141,7 @@ export function OrderForm() {
     );
   };
 
-  const searchString = [endereco, numero, bairro, cidade, estado, referencia].filter(Boolean).join(' ');
+  const searchString = [endereco, numero, bairro, cidade, estado].filter(Boolean).join(', ');
   const finalLocationLink = locationLink || (endereco.trim() ? `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(searchString)}` : undefined);
 
   const calculateTotal = () => {
@@ -318,8 +319,8 @@ export function OrderForm() {
                 
                 {locationLink && (
                   <div className="bg-green-500/10 border border-green-500/30 text-green-400 px-4 py-2 rounded-xl text-sm flex items-center gap-2 animate-fade-in">
-                    <MapIcon className="w-4 h-4 shrink-0" />
-                    Localização exata capturada com sucesso!
+                    <MapIcon className="w-4 h-4 shrink-0 mt-0.5" />
+                    <span>GPS capturado! Por favor, digite o nome da sua rua e bairro abaixo para confirmar.</span>
                   </div>
                 )}
 

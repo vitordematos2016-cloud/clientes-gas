@@ -114,9 +114,6 @@ export function OrderForm() {
           const data = await res.json();
           if (data && data.address) {
             const addr = data.address;
-            const street = addr.road || addr.pedestrian || addr.street || addr.path;
-            const houseNumber = addr.house_number || '';
-            const neighborhood = addr.suburb || addr.neighbourhood || addr.quarter || addr.city_district || addr.village || addr.residential || addr.hamlet || addr.district || '';
             const city = addr.city || addr.town || addr.municipality || '';
             const state = addr.state || addr.province || '';
 

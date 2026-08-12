@@ -38,7 +38,7 @@ export function formatWhatsAppMessage(data: OrderData): string {
 
   if (data.deliveryMethod === 'entrega') {
     messageParts.push(
-      `\n📍 *Endereço:*\n${data.endereco}, ${data.numero}\nBairro: ${data.bairro}\nCidade: ${data.cidade} - ${data.estado}`
+      `\n📍 *Endereço de Entrega:*\n*Rua/Av:* ${data.endereco}, ${data.numero}\n*Bairro:* ${data.bairro}\n*Cidade:* ${data.cidade} - ${data.estado}`
     );
     
     if (data.tipoLocal) {

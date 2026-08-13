@@ -50,8 +50,13 @@ export function formatWhatsAppMessage(data: OrderData): string {
     }
 
     if (data.latitude && data.longitude) {
+      // Link de visualização (pino confirmado pelo cliente)
       const mapsLink = `https://www.openstreetmap.org/?mlat=${data.latitude}&mlon=${data.longitude}#map=18/${data.latitude}/${data.longitude}`;
-      messageParts.push(`🗺️ *Abrir localização no mapa:*\n${mapsLink}`);
+      messageParts.push(`📍 *Ver local da entrega:*\n${mapsLink}`);
+
+      // Link de rota (destino = coordenadas confirmadas, nunca o endereço textual)
+      const routeLink = `https://www.google.com/maps/dir/?api=1&destination=${data.latitude},${data.longitude}&travelmode=driving`;
+      messageParts.push(`🚗 *Traçar rota até o cliente:*\n${routeLink}`);
     } else if (data.locationLink) {
       messageParts.push(`🗺️ *Localização Exata no Mapa:*\n${data.locationLink}`);
     }

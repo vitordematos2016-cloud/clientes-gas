@@ -18,6 +18,16 @@ export const siteConfig = {
     secondary: '#3b82f6', // Azul
   },
 
+  // Mapas
+  mapConfig: {
+    GEO_PROVIDER: 'nominatim',
+    TILE_PROVIDER: 'openstreetmap',
+    TILE_URL: 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+    NOMINATIM_URL: 'https://nominatim.openstreetmap.org',
+    ATTRIBUTION: '&copy; OpenStreetMap contributors'
+  },
+
+
   // Produtos
   products: [
     {

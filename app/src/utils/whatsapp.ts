@@ -50,7 +50,7 @@ export function formatWhatsAppMessage(data: OrderData): string {
     }
 
     if (data.latitude && data.longitude) {
-      const mapsLink = `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
+      const mapsLink = `https://www.openstreetmap.org/?mlat=${data.latitude}&mlon=${data.longitude}#map=18/${data.latitude}/${data.longitude}`;
       messageParts.push(`🗺️ *Abrir localização no mapa:*\n${mapsLink}`);
     } else if (data.locationLink) {
       messageParts.push(`🗺️ *Localização Exata no Mapa:*\n${data.locationLink}`);

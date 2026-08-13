@@ -1,5 +1,5 @@
-import { useState, useEffect, useRef, useMemo } from 'react';
-import { ArrowRight, MapPin, Loader2, Map as MapIcon, ShoppingBag, Plus, Minus, CheckCircle2, Search } from 'lucide-react';
+import { useState, useEffect, useRef, useMemo, useCallback } from 'react';
+import { ArrowRight, MapPin, Loader2, ShoppingBag, Plus, Minus, CheckCircle2, Search, Crosshair, Check } from 'lucide-react';
 import { MapContainer, TileLayer, Marker, useMap } from 'react-leaflet';
 import L from 'leaflet';
 import 'leaflet/dist/leaflet.css';
@@ -18,12 +18,13 @@ L.Icon.Default.mergeOptions({
 import type { OrderData, PaymentMethod, OrderItem } from '../types';
 import { OrderSummary } from './OrderSummary';
 import { siteConfig } from '../config';
+import { geocodingService, type GeocodingResult } from '../services/geocodingService';
 
 // Componente auxiliar para atualizar a posição do mapa
 function MapUpdater({ center }: { center: { lat: number, lng: number } }) {
   const map = useMap();
   useEffect(() => {
-    map.setView(center, 16);
+    map.setView(center, map.getZoom() < 16 ? 16 : map.getZoom());
   }, [center, map]);
   return null;
 }
@@ -49,16 +50,20 @@ export function OrderForm() {
   const [cep, setCep] = useState('');
   const [referencia, setReferencia] = useState('');
   
-  // OSM Map State
+  // Mapa e Localização
   const [latitude, setLatitude] = useState<number | undefined>();
   const [longitude, setLongitude] = useState<number | undefined>();
   const [formattedAddress, setFormattedAddress] = useState<string | undefined>();
-  const [mapCenter, setMapCenter] = useState({ lat: -23.5505, lng: -46.6333 });
+  const [mapCenter, setMapCenter] = useState({ lat: -24.9555, lng: -53.4552 }); // Cascavel PR Default
   
   const [searchQuery, setSearchQuery] = useState('');
-  const [searchResults, setSearchResults] = useState<any[]>([]);
+  const [searchResults, setSearchResults] = useState<GeocodingResult[]>([]);
   const [isSearching, setIsSearching] = useState(false);
   const [isFetchingLocation, setIsFetchingLocation] = useState(false);
+  const [locationAccuracy, setLocationAccuracy] = useState<number | null>(null);
+  
+  // Flag de Confirmação de Segurança
+  const [isLocationConfirmed, setIsLocationConfirmed] = useState(false);
   
   const markerRef = useRef<any>(null);
 
@@ -129,9 +134,15 @@ export function OrderForm() {
   };
 
   const validateStep2 = () => {
-    if (deliveryMethod === 'entrega' && (!endereco.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado.trim())) {
-      setErrorMsg('Preencha seu endereço completo.');
-      return false;
+    if (deliveryMethod === 'entrega') {
+      if (!endereco.trim() || !numero.trim() || !bairro.trim() || !cidade.trim() || !estado.trim()) {
+        setErrorMsg('Preencha seu endereço completo. Se a busca falhou, preencha os campos abaixo.');
+        return false;
+      }
+      if (latitude !== undefined && longitude !== undefined && !isLocationConfirmed) {
+        setErrorMsg('Por favor, clique no botão verde "Confirmar este local" logo abaixo do mapa.');
+        return false;
+      }
     }
     setErrorMsg('');
     return true;
@@ -172,83 +183,62 @@ export function OrderForm() {
     setStep('summary');
   };
 
-  // --- Funções de Mapa e Geocoding (Nominatim / OSM) ---
+  // --- Funções da Arquitetura de Geocoding (Isolada) ---
 
-  const fillAddressFromOSM = (address: any) => {
+  const populateAddressFields = (address: any) => {
     if (!address) return;
-    
-    // Road
-    const route = address.road || address.pedestrian || address.street || '';
-    if (route) setEndereco(route);
-    
-    // Number
-    const houseNumber = address.house_number || '';
-    if (houseNumber) setNumero(houseNumber);
-    
-    // Neighborhood / Suburb
-    const neighborhood = address.suburb || address.neighbourhood || address.residential || address.district || '';
-    if (neighborhood) setBairro(neighborhood);
-    
-    // City
-    const city = address.city || address.town || address.village || address.municipality || '';
-    if (city) setCidade(city);
-    
-    // State
-    const state = address.state || address.region || '';
-    if (state) setEstado(state);
-    
-    // Postcode
-    const postcode = address.postcode || '';
-    if (postcode) setCep(postcode);
+    if (address.road) setEndereco(address.road);
+    if (address.houseNumber) setNumero(address.houseNumber);
+    if (address.neighborhood) setBairro(address.neighborhood);
+    if (address.city) setCidade(address.city);
+    if (address.state) setEstado(address.state);
+    if (address.postcode) setCep(address.postcode);
   };
 
-  const doReverseGeocode = async (lat: number, lng: number) => {
-    try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&addressdetails=1`);
-      const data = await res.json();
-      if (data && data.address) {
-        fillAddressFromOSM(data.address);
-        setFormattedAddress(data.display_name);
-      }
-    } catch (e) {
-      console.error('Erro no reverse geocoding', e);
+  const doReverseGeocode = useCallback(async (lat: number, lng: number) => {
+    const result = await geocodingService.reverseGeocode(lat, lng);
+    if (result) {
+      // Regra de Ouro: O texto é só um apoio, não sobrescrever algo muito manual se não quiser, 
+      // mas na prática populamos para ajudar o cliente
+      populateAddressFields(result.address);
+      setFormattedAddress(result.displayName);
     }
-  };
+  }, []);
 
   const handleSearchAddress = async () => {
     if (!searchQuery.trim()) return;
     setIsSearching(true);
     setSearchResults([]);
+    setIsLocationConfirmed(false);
+    
     try {
-      const res = await fetch(`https://nominatim.openstreetmap.org/search?format=json&q=${encodeURIComponent(searchQuery)}&countrycodes=br&addressdetails=1&limit=5`);
-      const data = await res.json();
-      setSearchResults(data);
-      if (data.length === 0) {
-        setErrorMsg('Nenhum resultado encontrado.');
+      const results = await geocodingService.searchAddress(searchQuery);
+      setSearchResults(results);
+      if (results.length === 0) {
+        setErrorMsg('Não encontramos esse endereço automaticamente. Você pode indicar o local diretamente no mapa ou preencher os campos de texto.');
       } else {
         setErrorMsg('');
       }
     } catch (e) {
       console.error('Erro na busca', e);
-      setErrorMsg('Erro ao buscar o endereço.');
+      setErrorMsg('Erro ao buscar o endereço. Você pode preencher os dados manualmente logo abaixo.');
     } finally {
       setIsSearching(false);
     }
   };
 
-  const selectSearchResult = (result: any) => {
-    const lat = parseFloat(result.lat);
-    const lng = parseFloat(result.lon);
-    
-    setLatitude(lat);
-    setLongitude(lng);
-    setMapCenter({ lat, lng });
-    setFormattedAddress(result.display_name);
-    fillAddressFromOSM(result.address);
+  const selectSearchResult = (result: GeocodingResult) => {
+    setLatitude(result.lat);
+    setLongitude(result.lng);
+    setMapCenter({ lat: result.lat, lng: result.lng });
+    setFormattedAddress(result.displayName);
+    populateAddressFields(result.address);
     
     setSearchResults([]);
     setSearchQuery('');
     setErrorMsg('');
+    setIsLocationConfirmed(false); // Exige confirmação
+    setLocationAccuracy(null);
   };
 
   const handleGetLocation = () => {
@@ -258,26 +248,26 @@ export function OrderForm() {
     }
     setIsFetchingLocation(true);
     setErrorMsg('');
+    setIsLocationConfirmed(false);
 
     navigator.geolocation.getCurrentPosition(
       async (position) => {
         const lat = position.coords.latitude;
         const lng = position.coords.longitude;
+        const acc = position.coords.accuracy;
+        
         setLatitude(lat);
         setLongitude(lng);
         setMapCenter({ lat, lng });
+        setLocationAccuracy(acc);
         
-        const acc = position.coords.accuracy;
-        if (acc > 100) {
-           setErrorMsg('Encontramos sua localização aproximadamente. Confirme o ponto da entrega arrastando o pino.');
-        }
-
+        // Reverse geocoding de uma única chamada para evitar spam
         await doReverseGeocode(lat, lng);
         setIsFetchingLocation(false);
       },
       (error) => {
         setIsFetchingLocation(false);
-        setErrorMsg('Não foi possível obter a localização. Verifique as permissões do navegador.');
+        setErrorMsg('Não foi possível obter a localização. Verifique as permissões ou digite manualmente.');
         console.error(error);
       },
       { enableHighAccuracy: true, maximumAge: 0, timeout: 15000 }
@@ -293,12 +283,21 @@ export function OrderForm() {
           setLatitude(position.lat);
           setLongitude(position.lng);
           setMapCenter({ lat: position.lat, lng: position.lng });
+          setLocationAccuracy(null); // Desativamos o aviso numérico de precisão de GPS pois agora é manual
+          setIsLocationConfirmed(false); // Ao mover o pino, perde a confirmação e exige de novo
+          
+          // Uma única consulta no dragend, respeitando o limite do cache/throttle no Service
           doReverseGeocode(position.lat, position.lng);
         }
       },
     }),
-    [],
+    [doReverseGeocode],
   );
+
+  const confirmLocation = () => {
+    setIsLocationConfirmed(true);
+    setErrorMsg('');
+  };
 
   const buildOrderData = (): OrderData => {
     const itens: OrderItem[] = Object.entries(cart).map(([productId, quantity]) => {
@@ -488,57 +487,64 @@ export function OrderForm() {
                           type="button"
                           onClick={handleGetLocation}
                           disabled={isFetchingLocation}
-                          className="flex items-center justify-center gap-2 text-sm text-primary hover:text-primaryHover transition-colors font-medium bg-primary/10 px-4 py-2 rounded-lg border border-primary/20 hover:border-primary/50 disabled:opacity-50"
+                          className="flex items-center justify-center gap-2 text-sm text-primary hover:text-primaryHover transition-colors font-medium bg-primary/10 px-4 py-2.5 rounded-xl border border-primary/20 hover:border-primary/50 disabled:opacity-50"
                         >
-                          {isFetchingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <MapIcon className="w-4 h-4" />}
+                          {isFetchingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crosshair className="w-4 h-4" />}
                           Usar minha localização
                         </button>
                       </div>
 
-                      {/* OSM Nominatim Search */}
-                      <div className="mb-4 relative">
-                        <div className="flex relative">
+                      {/* Arquitetura de Serviço: Busca via botão e regras restritas */}
+                      <div className="mb-6 relative">
+                        <div className="flex relative items-stretch gap-2">
                           <input
                             type="text"
-                            placeholder="Buscar endereço ou comércio (Ex: Muffato Cascavel)..."
+                            placeholder="Buscar endereço ou comércio..."
                             value={searchQuery}
                             onChange={(e) => setSearchQuery(e.target.value)}
                             onKeyDown={(e) => { if (e.key === 'Enter') { e.preventDefault(); handleSearchAddress(); } }}
-                            className="w-full bg-surface border-2 border-primary/30 rounded-xl px-4 py-4 pr-12 focus:outline-none focus:border-primary transition-colors text-white font-medium shadow-lg shadow-black/50"
+                            className="flex-1 bg-surface border-2 border-white/10 focus:border-primary/50 rounded-xl px-4 py-3.5 focus:outline-none transition-colors text-white font-medium"
                           />
                           <button 
                             type="button"
                             onClick={handleSearchAddress}
                             disabled={isSearching || !searchQuery}
-                            className="absolute right-2 top-2 bottom-2 bg-primary/20 hover:bg-primary/40 text-primary rounded-lg px-3 transition-colors flex items-center justify-center"
+                            className="bg-primary text-background hover:bg-primaryHover rounded-xl px-6 font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
                           >
                             {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
+                            Buscar
                           </button>
                         </div>
                         {searchResults.length > 0 && (
-                          <div className="absolute z-[1000] top-full left-0 right-0 mt-2 bg-surface border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
+                          <div className="absolute z-[1000] top-full left-0 right-0 mt-2 bg-[#2a2a2a] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
                             {searchResults.map((result) => (
                               <button
-                                key={result.place_id}
+                                key={result.placeId}
                                 type="button"
                                 onClick={() => selectSearchResult(result)}
-                                className="w-full text-left px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors text-sm last:border-0"
+                                className="w-full text-left px-5 py-3.5 border-b border-white/5 hover:bg-white/5 transition-colors text-sm last:border-0 hover:text-primary"
                               >
-                                {result.display_name}
+                                {result.displayName}
                               </button>
                             ))}
                           </div>
                         )}
-                        <p className="text-xs text-textMuted mt-2">Você pode buscar pelo nome da rua ou do estabelecimento.</p>
                       </div>
 
-                      {/* Mapa Interativo Leaflet */}
+                      {/* Mapa Interativo Elegante */}
                       {latitude !== undefined && longitude !== undefined && (
-                        <div className="mb-6 rounded-xl overflow-hidden border-2 border-white/10 shadow-lg shadow-black/50 relative z-0">
-                          <div className="bg-primary/20 p-2 text-center text-sm font-bold text-primary border-b border-primary/20">
-                            Confirme o local da entrega. Arraste o pino para a entrada correta.
+                        <div className={`mb-6 rounded-2xl overflow-hidden border-2 shadow-xl relative z-0 transition-colors ${isLocationConfirmed ? 'border-green-500/50 shadow-green-500/20' : 'border-white/10 shadow-black/40'}`}>
+                          
+                          {/* Banner Superior Exigido */}
+                          <div className="bg-primary/10 backdrop-blur-md p-3 text-center border-b border-primary/20 flex flex-col gap-1 items-center justify-center">
+                            <span className="font-bold text-primary flex items-center gap-2">
+                              <MapPin className="w-5 h-5" />
+                              📍 Confirme o ponto exato da entrega
+                            </span>
+                            <span className="text-xs text-primary/80">Arraste o marcador até a entrada correta da casa, prédio ou comércio.</span>
                           </div>
-                          <div className="h-[250px] w-full">
+
+                          <div className="h-[260px] w-full relative">
                             <MapContainer 
                               center={mapCenter} 
                               zoom={16} 
@@ -546,8 +552,8 @@ export function OrderForm() {
                               style={{ height: '100%', width: '100%', zIndex: 0 }}
                             >
                               <TileLayer
-                                attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
-                                url="https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png"
+                                attribution={siteConfig.mapConfig.ATTRIBUTION}
+                                url={siteConfig.mapConfig.TILE_URL}
                               />
                               <MapUpdater center={mapCenter} />
                               <Marker 
@@ -557,11 +563,45 @@ export function OrderForm() {
                                 ref={markerRef}
                               />
                             </MapContainer>
+                            
+                            {/* Dica de endereço atualizada em tempo real (Overlay) */}
+                            {endereco && (
+                              <div className="absolute bottom-3 left-1/2 -translate-x-1/2 z-[400] bg-background/95 backdrop-blur shadow-lg border border-white/10 px-4 py-2 rounded-xl text-center pointer-events-none w-[90%] max-w-sm">
+                                <span className="block text-xs text-textMuted mb-0.5">Ponto do pino</span>
+                                <span className="block text-sm font-bold text-white truncate">{endereco}{bairro ? `, ${bairro}` : ''}</span>
+                              </div>
+                            )}
+                          </div>
+                          
+                          {/* Rodapé do mapa: Botão de confirmação e Info GPS */}
+                          <div className="bg-surface/80 p-4 border-t border-white/10 flex flex-col gap-3">
+                            {locationAccuracy && locationAccuracy > 20 && (
+                              <div className="text-xs text-yellow-500/90 text-center font-medium bg-yellow-500/10 p-2 rounded-lg">
+                                Localização encontrada com precisão aproximada de {Math.round(locationAccuracy)} metros. Ajuste o pino.
+                              </div>
+                            )}
+                            
+                            {!isLocationConfirmed ? (
+                              <button 
+                                type="button"
+                                onClick={confirmLocation}
+                                className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg shadow-green-500/20 animate-pulse-soft"
+                              >
+                                <CheckCircle2 className="w-5 h-5" />
+                                Confirmar este local
+                              </button>
+                            ) : (
+                              <div className="w-full py-3 bg-green-500/20 text-green-400 font-bold rounded-xl flex justify-center items-center gap-2 border border-green-500/30">
+                                <Check className="w-5 h-5" />
+                                Local Confirmado
+                              </div>
+                            )}
                           </div>
                         </div>
                       )}
                       
-                      <div className="space-y-4 bg-surface/30 p-4 rounded-xl border border-white/5">
+                      {/* Formulário Manual (Fallback Constante) */}
+                      <div className="space-y-4 bg-surface/30 p-4 rounded-2xl border border-white/5 shadow-inner">
                         <div className="grid grid-cols-1 sm:grid-cols-[2fr_1fr] gap-4">
                           <input 
                             type="text" 
@@ -620,7 +660,7 @@ export function OrderForm() {
                         </div>
                         
                         <div className="space-y-2 mt-6 pt-6 border-t border-white/10">
-                          <label className="text-sm font-bold block mb-2">Quando deseja receber?</label>
+                          <label className="text-sm font-bold block mb-2 text-textMuted">Quando deseja receber?</label>
                           <select
                             value={tempoEntrega}
                             onChange={e => setTempoEntrega(e.target.value)}
@@ -646,7 +686,7 @@ export function OrderForm() {
                   )}
 
                   {deliveryMethod === 'retirada' && (
-                    <div className="bg-surface/50 border border-white/5 rounded-xl p-8 text-center space-y-4 mt-6">
+                    <div className="bg-surface/50 border border-white/5 rounded-2xl p-8 text-center space-y-4 mt-6">
                       <div className="w-16 h-16 bg-primary/10 rounded-full flex items-center justify-center mx-auto mb-2">
                         <MapPin className="w-8 h-8 text-primary" />
                       </div>
@@ -749,7 +789,7 @@ export function OrderForm() {
 
               {/* ERRO VISUAL */}
               {errorMsg && (
-                <div className="bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm font-medium animate-fade-in flex items-center gap-2 mt-4">
+                <div className="bg-red-500/10 border border-red-500/50 text-red-200 px-4 py-3 rounded-xl text-sm font-medium animate-fade-in flex items-center gap-2 mt-4 shadow-lg">
                   <div className="w-1.5 h-1.5 rounded-full bg-red-500 shrink-0" />
                   {errorMsg}
                 </div>

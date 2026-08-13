@@ -28,12 +28,12 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
             <p className="text-text mb-1">{siteConfig.address}</p>
             <p className="text-textMuted text-sm mb-4">Confira com o vendedor a localização exata.</p>
             <a 
-              href={`https://maps.google.com/?q=${encodeURIComponent(siteConfig.address)}`} 
+              href={`https://www.openstreetmap.org/search?query=${encodeURIComponent(siteConfig.address)}`} 
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-center font-medium transition-colors"
             >
-              Abrir no Google Maps
+              Abrir no Mapa
             </a>
           </div>
         )}

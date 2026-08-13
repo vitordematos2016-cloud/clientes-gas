@@ -28,10 +28,10 @@ export function CommercialCTA() {
             href={matosLink}
             target="_blank"
             rel="noopener noreferrer"
-            className="bg-white text-background font-bold text-lg px-8 py-4 rounded-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2 shadow-xl shadow-white/10"
+            className="w-full sm:w-auto max-w-full min-w-0 bg-white text-background font-bold text-[clamp(0.9rem,3.5vw,1.125rem)] px-6 sm:px-8 py-3 sm:py-4 rounded-xl transition-all hover:scale-105 active:scale-95 flex flex-wrap sm:flex-nowrap justify-center items-center gap-2 shadow-xl shadow-white/10"
           >
-            Quero um site assim para minha empresa
-            <ArrowRight className="w-5 h-5" />
+            <span className="text-center">Quero um site assim para minha empresa</span>
+            <ArrowRight className="w-5 h-5 shrink-0" />
           </a>
         </div>
       </div>

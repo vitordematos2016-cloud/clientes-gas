@@ -3,6 +3,18 @@
 @tailwind utilities;
 
 @layer base {
+  *, *::before, *::after {
+    box-sizing: border-box;
+  }
+
+  html, body, #root {
+    width: 100%;
+    max-width: 100%;
+    overflow-x: clip;
+    overflow-wrap: anywhere;
+    word-break: normal;
+  }
+
   body {
     @apply bg-background text-text font-sans antialiased;
   }
@@ -12,7 +24,7 @@
   .glass {
     @apply bg-surface/80 backdrop-blur-md border border-white/5;
   }
-  
+
   .glass-card {
     @apply bg-surface/50 backdrop-blur-lg border border-white/10 rounded-2xl shadow-xl;
   }

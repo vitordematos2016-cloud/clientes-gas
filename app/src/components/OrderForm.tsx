@@ -19,6 +19,7 @@ import type { OrderData, PaymentMethod, OrderItem } from '../types';
 import { OrderSummary } from './OrderSummary';
 import { siteConfig } from '../config';
 import { geocodingService, type GeocodingResult } from '../services/geocodingService';
+import { placeSearchService, type PlaceResult } from '../services/placeSearchService';
 
 // Componente auxiliar para atualizar a posição do mapa
 function MapUpdater({ center }: { center: { lat: number, lng: number } }) {
@@ -205,19 +206,96 @@ export function OrderForm() {
     }
   }, []);
 
+  /**
+   * Converte PlaceResult (TomTom) para GeocodingResult (formato unificado do app).
+   */
+  const placeToGeocodingResult = (place: PlaceResult): GeocodingResult => ({
+    placeId: place.id,
+    lat: place.latitude,
+    lng: place.longitude,
+    displayName: [place.name, place.address].filter(Boolean).join(' — '),
+    address: {
+      road: place.street,
+      houseNumber: place.number,
+      neighborhood: place.neighborhood,
+      city: place.city,
+      state: place.state,
+      postcode: place.postalCode,
+    },
+    distanceKm: place.distanceKm,
+    distanceLabel: place.distanceLabel,
+    type: 'poi',
+    provider: place.provider,
+  });
+
   const handleSearchAddress = async () => {
     if (!searchQuery.trim()) return;
+
     setIsSearching(true);
     setSearchResults([]);
     setIsLocationConfirmed(false);
-    
+    setErrorMsg('');
+
+    const searchContext = {
+      city: cidade,
+      state: estado,
+      latitude,
+      longitude,
+    };
+
     try {
-      const results = await geocodingService.searchAddress(searchQuery);
-      setSearchResults(results);
-      if (results.length === 0) {
-        setErrorMsg('Não encontramos esse endereço automaticamente. Você pode indicar o local diretamente no mapa ou preencher os campos de texto.');
+      const isPOI = geocodingService.isPOIQuery(searchQuery);
+
+      if (isPOI) {
+        // --- ROTA POI: TomTom primeiro, Nominatim como fallback ---
+        console.log('[Search] Detectado como POI. Tentando TomTom...');
+
+        const { results: tomtomResults, needsContext } = await placeSearchService.searchPlaces(
+          searchQuery,
+          searchContext,
+        );
+
+        if (needsContext) {
+          setErrorMsg('Informe sua cidade ou use sua localização para encontrarmos estabelecimentos próximos.');
+          setIsSearching(false);
+          return;
+        }
+
+        if (tomtomResults.length > 0) {
+          // Converter para formato unificado
+          const unified = tomtomResults.map(placeToGeocodingResult);
+          setSearchResults(unified);
+          setIsSearching(false);
+          return;
+        }
+
+        // Fallback: tentar Nominatim
+        console.log('[Search] TomTom sem resultado útil. Tentando Nominatim...');
+        const nominatimResults = await geocodingService.searchAddress(searchQuery, searchContext);
+        setSearchResults(nominatimResults);
+
+        if (nominatimResults.length === 0) {
+          setErrorMsg('Não encontramos esse estabelecimento próximo à sua localização. Tente outro nome ou indique o ponto diretamente no mapa.');
+        }
       } else {
-        setErrorMsg('');
+        // --- ROTA ENDEREÇO: Nominatim primeiro ---
+        console.log('[Search] Detectado como endereço. Usando Nominatim...');
+
+        const results = await geocodingService.searchAddress(searchQuery, searchContext);
+        setSearchResults(results);
+
+        if (results.length === 0) {
+          // Fallback: tentar TomTom (pode ser um nome de lugar sem indicadores de endereço)
+          const { results: fallbackResults } = await placeSearchService.searchPlaces(
+            searchQuery,
+            searchContext,
+          );
+          if (fallbackResults.length > 0) {
+            setSearchResults(fallbackResults.map(placeToGeocodingResult));
+          } else {
+            setErrorMsg('Não encontramos esse endereço automaticamente. Você pode indicar o local diretamente no mapa ou preencher os campos de texto.');
+          }
+        }
       }
     } catch (e) {
       console.error('Erro na busca', e);
@@ -334,7 +412,7 @@ export function OrderForm() {
 
   return (
     <section id="order-section" className="py-20 px-4 scroll-mt-20">
-      <div className="max-w-2xl mx-auto glass-card p-6 md:p-10 relative overflow-hidden">
+      <div className="max-w-2xl mx-auto glass-card p-4 sm:p-6 md:p-10 relative overflow-hidden w-full">
         <div className="absolute top-0 right-0 w-64 h-64 bg-primary/5 blur-[80px] rounded-full pointer-events-none" />
         
         {step === 'summary' ? (
@@ -487,7 +565,7 @@ export function OrderForm() {
                           type="button"
                           onClick={handleGetLocation}
                           disabled={isFetchingLocation}
-                          className="flex items-center justify-center gap-2 text-sm text-primary hover:text-primaryHover transition-colors font-medium bg-primary/10 px-4 py-2.5 rounded-xl border border-primary/20 hover:border-primary/50 disabled:opacity-50"
+                          className="flex flex-wrap sm:flex-nowrap items-center justify-center gap-2 text-[clamp(0.85rem,3vw,0.875rem)] text-primary hover:text-primaryHover transition-colors font-medium bg-primary/10 px-3 py-2.5 sm:px-4 rounded-xl border border-primary/20 hover:border-primary/50 disabled:opacity-50 w-full sm:w-auto max-w-full"
                         >
                           {isFetchingLocation ? <Loader2 className="w-4 h-4 animate-spin" /> : <Crosshair className="w-4 h-4" />}
                           Usar minha localização
@@ -509,31 +587,55 @@ export function OrderForm() {
                             type="button"
                             onClick={handleSearchAddress}
                             disabled={isSearching || !searchQuery}
-                            className="bg-primary text-background hover:bg-primaryHover rounded-xl px-6 font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20"
+                            className="bg-primary text-background hover:bg-primaryHover rounded-xl px-4 sm:px-6 font-bold transition-colors flex items-center justify-center gap-2 shadow-lg shadow-primary/20 max-w-full min-w-0"
                           >
                             {isSearching ? <Loader2 className="w-5 h-5 animate-spin" /> : <Search className="w-5 h-5" />}
-                            Buscar
+                            <span className="hidden sm:inline">Buscar</span>
                           </button>
                         </div>
                         {searchResults.length > 0 && (
-                          <div className="absolute z-[1000] top-full left-0 right-0 mt-2 bg-[#2a2a2a] border border-white/10 rounded-xl shadow-2xl max-h-60 overflow-y-auto">
-                            {searchResults.map((result) => (
-                              <button
-                                key={result.placeId}
-                                type="button"
-                                onClick={() => selectSearchResult(result)}
-                                className="w-full text-left px-5 py-3.5 border-b border-white/5 hover:bg-white/5 transition-colors text-sm last:border-0 hover:text-primary"
-                              >
-                                {result.displayName}
-                              </button>
-                            ))}
+                          <div className="absolute z-[1000] top-full left-0 right-0 mt-2 bg-[#2a2a2a] border border-white/10 rounded-xl shadow-2xl max-h-72 overflow-y-auto">
+                            {searchResults.map((result) => {
+                              const city = result.address.city;
+                              const state = result.address.state;
+                              const road = result.address.road;
+                              const neighborhood = result.address.neighborhood;
+                              const providerLabel = (result as any).provider === 'tomtom' ? 'TomTom' : null;
+                              return (
+                                <button
+                                  key={result.placeId}
+                                  type="button"
+                                  onClick={() => selectSearchResult(result)}
+                                  className="w-full text-left px-4 py-3 border-b border-white/5 hover:bg-white/5 transition-colors last:border-0 hover:text-primary"
+                                >
+                                  <span className="block text-sm font-medium text-white truncate">
+                                    {result.displayName.split(/[,—]/)[0].trim()}
+                                  </span>
+                                  <span className="block text-xs text-textMuted mt-0.5 truncate">
+                                    {[road, neighborhood, city, state].filter(Boolean).join(', ')}
+                                  </span>
+                                  <div className="flex items-center gap-2 mt-1">
+                                    {result.distanceLabel && (
+                                      <span className="inline-block text-[11px] text-primary/80 bg-primary/10 px-2 py-0.5 rounded-full font-medium">
+                                        ≈ {result.distanceLabel}
+                                      </span>
+                                    )}
+                                    {providerLabel && (
+                                      <span className="inline-block text-[10px] text-blue-400/70 bg-blue-400/10 px-1.5 py-0.5 rounded-full font-medium">
+                                        {providerLabel}
+                                      </span>
+                                    )}
+                                  </div>
+                                </button>
+                              );
+                            })}
                           </div>
                         )}
                       </div>
 
                       {/* Mapa Interativo Elegante */}
                       {latitude !== undefined && longitude !== undefined && (
-                        <div className={`mb-6 rounded-2xl overflow-hidden border-2 shadow-xl relative z-0 transition-colors ${isLocationConfirmed ? 'border-green-500/50 shadow-green-500/20' : 'border-white/10 shadow-black/40'}`}>
+                        <div className={`mb-6 rounded-2xl overflow-hidden border-2 shadow-xl relative z-0 transition-colors w-full max-w-full ${isLocationConfirmed ? 'border-green-500/50 shadow-green-500/20' : 'border-white/10 shadow-black/40'}`}>
                           
                           {/* Banner Superior Exigido */}
                           <div className="bg-primary/10 backdrop-blur-md p-3 text-center border-b border-primary/20 flex flex-col gap-1 items-center justify-center">
@@ -585,9 +687,9 @@ export function OrderForm() {
                               <button 
                                 type="button"
                                 onClick={confirmLocation}
-                                className="w-full py-3 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl flex justify-center items-center gap-2 transition-all shadow-lg shadow-green-500/20 animate-pulse-soft"
+                                className="w-full max-w-full min-w-0 py-3 px-2 bg-green-500 hover:bg-green-600 text-white font-bold rounded-xl flex flex-wrap sm:flex-nowrap justify-center items-center gap-2 transition-all shadow-lg shadow-green-500/20 animate-pulse-soft text-[clamp(0.9rem,3.5vw,1rem)]"
                               >
-                                <CheckCircle2 className="w-5 h-5" />
+                                <CheckCircle2 className="w-5 h-5 shrink-0" />
                                 Confirmar este local
                               </button>
                             ) : (

@@ -29,38 +29,38 @@ export function Hero() {
           <span className="text-sm font-medium text-textMuted">Atendimento Imediato</span>
         </div>
 
-        <h1 className="text-4xl md:text-6xl lg:text-7xl font-extrabold tracking-tight mb-6 leading-tight drop-shadow-2xl">
+        <h1 className="text-[clamp(2rem,8vw,4.5rem)] font-extrabold tracking-tight mb-6 leading-tight drop-shadow-2xl">
           Ficou sem gás ou água? <br />
           <span className="text-transparent bg-clip-text bg-gradient-to-r from-primary to-orange-400">
             Peça agora e receba com rapidez.
           </span>
         </h1>
         
-        <p className="text-lg md:text-xl text-textMuted max-w-2xl mb-12">
+        <p className="text-[clamp(1rem,4vw,1.25rem)] text-textMuted max-w-2xl mb-12">
           Não deixe sua rotina parar. Faça seu pedido em poucos cliques e garanta a entrega mais rápida e segura da região diretamente na sua casa.
         </p>
 
         <div className="flex flex-col sm:flex-row items-center gap-4 w-full justify-center">
           <button 
             onClick={() => scrollToOrder('gas')}
-            className="w-full sm:w-auto group relative glass hover:bg-surface/90 border-primary/30 px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
+            className="w-full max-w-full min-w-0 sm:w-auto group relative glass hover:bg-surface/90 border-primary/30 px-6 py-3 sm:px-8 sm:py-4 rounded-2xl flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95 text-[clamp(0.9rem,3.5vw,1.125rem)]"
           >
             <div className="bg-primary/20 p-2 rounded-full group-hover:bg-primary/30 transition-colors">
               <Flame className="w-6 h-6 text-primary" />
             </div>
-            <span className="text-lg font-bold">Pedir Gás</span>
-            <ArrowRight className="w-5 h-5 text-textMuted group-hover:text-text transition-colors opacity-0 group-hover:opacity-100 -ml-2 group-hover:ml-0" />
+            <span className="font-bold">Pedir Gás</span>
+            <ArrowRight className="w-5 h-5 text-textMuted group-hover:text-text transition-colors opacity-0 group-hover:opacity-100 sm:-ml-2 sm:group-hover:ml-0" />
           </button>
           
           <button 
             onClick={() => scrollToOrder('agua')}
-            className="w-full sm:w-auto group relative glass hover:bg-surface/90 border-blue-400/30 px-8 py-4 rounded-2xl flex items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95"
+            className="w-full max-w-full min-w-0 sm:w-auto group relative glass hover:bg-surface/90 border-blue-400/30 px-6 py-3 sm:px-8 sm:py-4 rounded-2xl flex flex-wrap sm:flex-nowrap items-center justify-center gap-3 transition-all hover:scale-105 active:scale-95 text-[clamp(0.9rem,3.5vw,1.125rem)]"
           >
             <div className="bg-blue-400/20 p-2 rounded-full group-hover:bg-blue-400/30 transition-colors">
               <Droplets className="w-6 h-6 text-blue-400" />
             </div>
-            <span className="text-lg font-bold">Pedir Água</span>
-            <ArrowRight className="w-5 h-5 text-textMuted group-hover:text-text transition-colors opacity-0 group-hover:opacity-100 -ml-2 group-hover:ml-0" />
+            <span className="font-bold">Pedir Água</span>
+            <ArrowRight className="w-5 h-5 text-textMuted group-hover:text-text transition-colors opacity-0 group-hover:opacity-100 sm:-ml-2 sm:group-hover:ml-0" />
           </button>
         </div>
       </div>

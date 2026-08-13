@@ -97,5 +97,16 @@ export const siteConfig = {
       question: "Quais formas de pagamento vocês aceitam?",
       answer: "Aceitamos Pix, Dinheiro e Cartões de Crédito e Débito (levamos a maquininha até você)."
     }
-  ]
+  ],
+
+  // TomTom Search API (busca de comércios/POIs)
+  tomTomConfig: {
+    apiKey: import.meta.env.VITE_TOMTOM_API_KEY || '',
+    countrySet: 'BR',
+    language: 'pt-BR',
+    initialRadius: 10000,    // 10 km
+    expandedRadius: 25000,   // 25 km
+    maxRadius: 50000,        // 50 km
+    limit: 10,
+  },
 };

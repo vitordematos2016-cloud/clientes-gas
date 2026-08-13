@@ -21,7 +21,7 @@ export function Header() {
   return (
     <>
       <header className="fixed top-10 left-0 right-0 z-[100] glass border-b-0 border-white/10 shadow-md transition-all">
-        <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
+        <div className="max-w-5xl mx-auto px-2 sm:px-4 h-16 flex items-center justify-between w-full">
           
           {/* Mobile Menu Button (Left) */}
           <div className="md:hidden flex items-center">
@@ -48,7 +48,7 @@ export function Header() {
             <button onClick={() => scrollToSection('benefits')} className="hover:text-primary transition-colors">Vantagens</button>
           </nav>
           
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2 sm:gap-4">
             <a 
               href={generateWhatsAppContactLink()}
               target="_blank" 
@@ -69,7 +69,7 @@ export function Header() {
             </a>
             <button 
               onClick={scrollToOrder}
-              className="bg-primary hover:bg-primaryHover text-background font-bold px-4 py-2 text-sm sm:text-base sm:px-5 rounded-full transition-all active:scale-95 whitespace-nowrap"
+              className="bg-primary hover:bg-primaryHover text-background font-bold px-3 py-2 text-sm sm:text-base sm:px-5 rounded-full transition-all active:scale-95 max-w-full min-w-0 flex-shrink-1"
             >
               Pedir agora
             </button>

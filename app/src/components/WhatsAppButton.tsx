@@ -9,7 +9,7 @@ export function WhatsAppButton() {
   );
 
   return (
-    <div className="fixed bottom-6 right-6 z-50 flex flex-col gap-3">
+    <div className="fixed z-50 flex flex-col gap-3" style={{ right: 'max(16px, env(safe-area-inset-right))', bottom: 'max(16px, env(safe-area-inset-bottom))' }}>
       {/* Botão Comercial (Matos Soluções) */}
       <a
         href={matosLink}

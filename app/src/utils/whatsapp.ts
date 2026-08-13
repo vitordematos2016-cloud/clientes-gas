@@ -1,26 +1,20 @@
 import type { OrderData } from '../types';
-
-export const WHATSAPP_NUMBER = '5545933005119';
+import { siteConfig } from '../config';
 
 export function formatWhatsAppMessage(data: OrderData): string {
   const itemsText = data.itens
     .map((item) => {
-      let unitPrice = 0;
-      if (item.tipo === 'gas') {
-        unitPrice = data.deliveryMethod === 'entrega' ? 130 : 125;
-      } else if (item.tipo === 'agua') {
-        unitPrice = 20;
-      }
-      const itemTotal = unitPrice * item.quantidade;
-      const itemName = item.tipo === 'gas' ? 'Gás' : 'Água';
-      return `${item.quantidade}x ${itemName} (R$ ${unitPrice.toFixed(2).replace('.', ',')}/un) = R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
+      const unitPrice = data.deliveryMethod === 'entrega' ? item.product.priceDelivery : item.product.pricePickup;
+      const itemTotal = unitPrice * item.quantity;
+      return `${item.quantity}x ${item.product.name} (R$ ${unitPrice.toFixed(2).replace('.', ',')}/${item.product.unit}) = R$ ${itemTotal.toFixed(2).replace('.', ',')}`;
     })
     .join('\n');
 
   const paymentText = 
     data.pagamento.metodo === 'pix' ? 'Pix' :
     data.pagamento.metodo === 'cartao' ? 'Cartão' :
-    `Dinheiro${data.pagamento.precisaTroco ? ` (Troco para R$ ${data.pagamento.trocoPara})` : ' (Sem troco)'}`;
+    data.pagamento.metodo === 'dinheiro' ? `Dinheiro${data.pagamento.precisaTroco ? ` (Troco para R$ ${data.pagamento.trocoPara})` : ' (Sem troco)'}` :
+    data.pagamento.metodo;
 
   const messageParts = [
     `🔥 *NOVO PEDIDO*`,
@@ -37,9 +31,11 @@ export function formatWhatsAppMessage(data: OrderData): string {
   );
 
   if (data.deliveryMethod === 'entrega') {
-    messageParts.push(
-      `\n📍 *Endereço de Entrega:*\n*Rua/Av:* ${data.endereco}, ${data.numero}\n*Bairro:* ${data.bairro}\n*Cidade:* ${data.cidade} - ${data.estado}`
-    );
+    let enderecoTexto = `\n📍 *Endereço de Entrega:*\n*Rua/Av:* ${data.endereco}, ${data.numero}\n*Bairro:* ${data.bairro}\n*Cidade:* ${data.cidade} - ${data.estado}`;
+    if (data.cep) {
+      enderecoTexto += `\n*CEP:* ${data.cep}`;
+    }
+    messageParts.push(enderecoTexto);
     
     if (data.tipoLocal) {
       messageParts.push(`🏢 *Tipo de Imóvel:* ${data.tipoLocal}`);
@@ -53,7 +49,10 @@ export function formatWhatsAppMessage(data: OrderData): string {
       messageParts.push(`⏰ *Quando Entregar:* ${data.tempoEntrega}`);
     }
 
-    if (data.locationLink) {
+    if (data.latitude && data.longitude) {
+      const mapsLink = `https://maps.google.com/?q=${data.latitude},${data.longitude}`;
+      messageParts.push(`🗺️ *Abrir localização no mapa:*\n${mapsLink}`);
+    } else if (data.locationLink) {
       messageParts.push(`🗺️ *Localização Exata no Mapa:*\n${data.locationLink}`);
     }
   }
@@ -66,17 +65,18 @@ export function formatWhatsAppMessage(data: OrderData): string {
     messageParts.push(`\n📝 *Observação:*\n${data.observacao}`);
   }
 
-  messageParts.push(`\n_Pedido realizado pelo site._`);
+  messageParts.push(`\n_Pedido realizado pelo site demo._`);
 
   return messageParts.join('\n');
 }
 
 export function generateWhatsAppLink(data: OrderData): string {
   const message = formatWhatsAppMessage(data);
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+  return `https://wa.me/${siteConfig.whatsapp}?text=${encodeURIComponent(message)}`;
 }
 
-export function generateWhatsAppContactLink(): string {
-  const message = 'Olá! Vim pelo site e gostaria de atendimento.';
-  return `https://wa.me/${WHATSAPP_NUMBER}?text=${encodeURIComponent(message)}`;
+export function generateWhatsAppContactLink(number?: string, customMessage?: string): string {
+  const message = customMessage || 'Olá! Vim pelo site e gostaria de atendimento.';
+  const targetNumber = number || siteConfig.whatsapp;
+  return `https://wa.me/${targetNumber}?text=${encodeURIComponent(message)}`;
 }

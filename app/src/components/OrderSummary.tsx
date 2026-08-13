@@ -2,6 +2,7 @@ import type { OrderData } from '../types';
 import { Pencil, Send, CheckCircle2, MapPin } from 'lucide-react';
 import { useState } from 'react';
 import { generateWhatsAppLink } from '../utils/whatsapp';
+import { siteConfig } from '../config';
 
 interface OrderSummaryProps {
   data: OrderData;
@@ -10,8 +11,6 @@ interface OrderSummaryProps {
 
 export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
   const [isSending, setIsSending] = useState(false);
-
-
 
   if (isSending) {
     return (
@@ -26,10 +25,10 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
               <span className="bg-primary/20 p-1.5 rounded-lg"><MapPin className="w-5 h-5" /></span>
               Endereço para Retirada
             </h4>
-            <p className="text-text mb-1">Rua Exemplo, 123 - Bairro Centro</p>
-            <p className="text-textMuted text-sm mb-4">Sua Cidade - PR, 80000-000</p>
+            <p className="text-text mb-1">{siteConfig.address}</p>
+            <p className="text-textMuted text-sm mb-4">Confira com o vendedor a localização exata.</p>
             <a 
-              href="https://maps.google.com/?q=Rua+Exemplo,+123+-+Bairro+Centro,+Sua+Cidade+-+PR" 
+              href={`https://maps.google.com/?q=${encodeURIComponent(siteConfig.address)}`} 
               target="_blank"
               rel="noopener noreferrer"
               className="block w-full py-2.5 bg-white/5 hover:bg-white/10 border border-white/10 rounded-lg text-center font-medium transition-colors"
@@ -55,20 +54,14 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
         <div>
           <span className="text-textMuted text-sm block mb-1">Pedido ({data.deliveryMethod === 'entrega' ? 'Entrega' : 'Retirar no local'})</span>
           <div className="font-medium">
-            {data.itens.map((i, idx) => {
-              let unitPrice = 0;
-              if (i.tipo === 'gas') {
-                unitPrice = data.deliveryMethod === 'entrega' ? 130 : 125;
-              } else if (i.tipo === 'agua') {
-                unitPrice = 20;
-              }
-              const itemTotal = unitPrice * i.quantidade;
-              const itemName = i.tipo === 'gas' ? 'Gás' : 'Água';
+            {data.itens.map((item, idx) => {
+              const unitPrice = data.deliveryMethod === 'entrega' ? item.product.priceDelivery : item.product.pricePickup;
+              const itemTotal = unitPrice * item.quantity;
               return (
                 <div key={idx} className="flex justify-between items-center border-b border-white/5 pb-2 mb-2 last:border-0 last:pb-0 last:mb-0">
                   <span>
-                    {i.quantidade}x {itemName} 
-                    <span className="text-xs text-textMuted ml-2">(R$ {unitPrice.toFixed(2).replace('.', ',')}/un)</span>
+                    {item.quantity}x {item.product.name} 
+                    <span className="text-xs text-textMuted ml-2">(R$ {unitPrice.toFixed(2).replace('.', ',')}/{item.product.unit})</span>
                   </span>
                   <span className="text-primary font-medium">R$ {itemTotal.toFixed(2).replace('.', ',')}</span>
                 </div>
@@ -81,11 +74,11 @@ export function OrderSummary({ data, onEdit }: OrderSummaryProps) {
           <div>
             <span className="text-textMuted text-sm block mb-1">Endereço</span>
             <span className="font-medium block">{data.endereco}, {data.numero} - {data.bairro}</span>
-            <span className="font-medium block">{data.cidade} - {data.estado}</span>
+            <span className="font-medium block">{data.cidade} - {data.estado}{data.cep ? ` - CEP: ${data.cep}` : ''}</span>
             {data.tipoLocal && <span className="text-sm text-textMuted mt-1 block">Tipo de Imóvel: {data.tipoLocal}</span>}
             {data.referencia && <span className="text-sm text-textMuted mt-1 block">Ref: {data.referencia}</span>}
             {data.tempoEntrega && <span className="text-sm text-textMuted mt-1 block text-primary">Quando entregar: {data.tempoEntrega}</span>}
-            {data.locationLink && (
+            {(data.latitude && data.longitude || data.locationLink) && (
               <span className="text-sm text-whatsapp mt-2 flex items-center gap-1 font-medium bg-whatsapp/10 w-fit px-2 py-1 rounded-md">
                 <CheckCircle2 className="w-4 h-4" /> Localização exata do mapa incluída
               </span>

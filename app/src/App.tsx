@@ -7,6 +7,8 @@ import { Benefits } from './components/Benefits';
 import { FAQ } from './components/FAQ';
 import { Footer } from './components/Footer';
 import { WhatsAppButton } from './components/WhatsAppButton';
+import { DemoBanner } from './components/DemoBanner';
+import { CommercialCTA } from './components/CommercialCTA';
 
 function App() {
   useEffect(() => {
@@ -17,7 +19,8 @@ function App() {
   }, []);
 
   return (
-    <div className="min-h-screen selection:bg-primary/30 selection:text-primary">
+    <div className="min-h-screen selection:bg-primary/30 selection:text-primary pt-10 sm:pt-10">
+      <DemoBanner />
       <Header />
       
       <main>
@@ -26,6 +29,7 @@ function App() {
         <OrderForm />
         <Benefits />
         <FAQ />
+        <CommercialCTA />
       </main>
 
       <Footer />

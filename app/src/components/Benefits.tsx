@@ -1,13 +1,13 @@
-import { Zap, Map, MessageSquare, Flame, Droplets, ShieldCheck } from 'lucide-react';
+import { Zap, MapPin, CreditCard, Clock, Smartphone, MessageCircle } from 'lucide-react';
 
 export function Benefits() {
   const benefits = [
-    { icon: <Zap className="w-6 h-6 text-primary" />, title: "Entrega Rápida" },
-    { icon: <Map className="w-6 h-6 text-primary" />, title: "Sua Região" },
-    { icon: <MessageSquare className="w-6 h-6 text-primary" />, title: "Preço Justo" },
-    { icon: <Flame className="w-6 h-6 text-primary" />, title: "Gás de Cozinha" },
-    { icon: <Droplets className="w-6 h-6 text-blue-400" />, title: "Água Mineral" },
-    { icon: <ShieldCheck className="w-6 h-6 text-primary" />, title: "Compromisso com Você" },
+    { icon: <Zap className="w-6 h-6 text-primary" />, title: "Pedido rápido", desc: "Escolha tudo sem precisar digitar." },
+    { icon: <MapPin className="w-6 h-6 text-primary" />, title: "Entrega fácil", desc: "Use sua localização." },
+    { icon: <CreditCard className="w-6 h-6 text-primary" />, title: "Escolha como pagar", desc: "Pix, dinheiro ou cartão." },
+    { icon: <Clock className="w-6 h-6 text-primary" />, title: "Agende sua entrega", desc: "Escolha quando deseja receber." },
+    { icon: <Smartphone className="w-6 h-6 text-primary" />, title: "Tudo pelo celular", desc: "Feito para smartphones." },
+    { icon: <MessageCircle className="w-6 h-6 text-primary" />, title: "Fácil pelo WhatsApp", desc: "O pedido chega organizado." },
   ];
 
   return (
@@ -17,12 +17,15 @@ export function Benefits() {
           {benefits.map((item, index) => (
             <div 
               key={index} 
-              className="bg-surface/40 border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-4 hover:bg-surface/60 transition-colors hover:border-primary/20"
+              className="bg-surface/40 border border-white/5 rounded-2xl p-6 flex flex-col items-center justify-center text-center gap-3 hover:bg-surface/60 transition-colors hover:border-primary/20 group"
             >
-              <div className="bg-background p-3 rounded-xl shadow-inner">
+              <div className="bg-background p-3 rounded-xl shadow-inner group-hover:scale-110 transition-transform">
                 {item.icon}
               </div>
-              <span className="font-medium">{item.title}</span>
+              <div>
+                <h4 className="font-bold mb-1">{item.title}</h4>
+                <p className="text-xs text-textMuted leading-tight">{item.desc}</p>
+              </div>
             </div>
           ))}
         </div>

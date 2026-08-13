@@ -5,17 +5,17 @@ export function HowItWorks() {
     {
       icon: <MousePointerClick className="w-8 h-8 text-primary" />,
       title: "1. Escolha seu pedido",
-      description: "Chame no WhatsApp"
+      description: "Selecione gás, água ou outros produtos."
     },
     {
       icon: <MapPin className="w-8 h-8 text-primary" />,
-      title: "2. Informe o endereço",
-      description: "Pelo nosso formulário prático"
+      title: "2. Informe onde entregar",
+      description: "Preencha seu endereço rapidamente."
     },
     {
       icon: <Send className="w-8 h-8 text-primary" />,
-      title: "3. Receba em casa",
-      description: "Entrega rápida garantida"
+      title: "3. Finalize pelo WhatsApp",
+      description: "Seu pedido chega organizado para a empresa."
     }
   ];
 

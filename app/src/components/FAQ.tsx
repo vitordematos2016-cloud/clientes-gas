@@ -1,24 +1,6 @@
 import { useState } from 'react';
 import { ChevronDown } from 'lucide-react';
-
-const faqs = [
-  {
-    question: 'Vocês instalam o gás?',
-    answer: 'Sim! Nosso entregador faz a instalação completa e o teste de vazamento na hora para garantir a sua total segurança, sem nenhum custo adicional.'
-  },
-  {
-    question: 'Qual o tempo médio de entrega?',
-    answer: 'Nossa equipe é focada em agilidade. O tempo médio de entrega costuma ser de 10 a 20 minutos após a confirmação do pedido, dependendo do seu bairro.'
-  },
-  {
-    question: 'Aceitam vale-alimentação?',
-    answer: 'Aceitamos as principais bandeiras de cartões de crédito, débito e Pix. (Por favor, confirme conosco no WhatsApp quais vales-alimentação específicos estamos aceitando no momento).'
-  },
-  {
-    question: 'Posso agendar uma entrega?',
-    answer: 'Com certeza! Você pode fazer o pedido pelo site e nos informar no WhatsApp o melhor horário para receber. Assim, deixamos tudo programado para você.'
-  }
-];
+import { siteConfig } from '../config';
 
 export function FAQ() {
   const [openIndex, setOpenIndex] = useState<number | null>(null);
@@ -35,7 +17,7 @@ export function FAQ() {
       </div>
 
       <div className="space-y-4">
-        {faqs.map((faq, index) => {
+        {siteConfig.faq.map((faq, index) => {
           const isOpen = openIndex === index;
           return (
             <div 

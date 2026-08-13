@@ -1,11 +1,4 @@
-export type OrderItemType = 'gas' | 'agua';
-
-export interface OrderItem {
-  tipo: OrderItemType;
-  quantidade: number;
-}
-
-export type PaymentMethod = 'pix' | 'dinheiro' | 'cartao';
+export type PaymentMethod = 'pix' | 'dinheiro' | 'cartao' | string;
 
 export interface PaymentDetails {
   metodo: PaymentMethod;
@@ -14,6 +7,22 @@ export interface PaymentDetails {
 }
 
 export type DeliveryMethod = 'entrega' | 'retirada';
+
+export interface ProductItem {
+  id: string;
+  name: string;
+  icon?: any; // Para armazenar referência do ícone Lucide
+  imageUrl?: string;
+  category: 'gas' | 'agua' | 'outros';
+  priceDelivery: number;
+  pricePickup: number;
+  unit: string;
+}
+
+export interface OrderItem {
+  product: ProductItem;
+  quantity: number;
+}
 
 export interface OrderData {
   nome: string;
@@ -26,6 +35,11 @@ export interface OrderData {
   bairro: string;
   cidade: string;
   estado: string;
+  cep?: string;
+  latitude?: number;
+  longitude?: number;
+  placeId?: string;
+  formattedAddress?: string;
   referencia?: string;
   locationLink?: string;
   itens: OrderItem[];

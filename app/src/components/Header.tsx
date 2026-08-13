@@ -3,6 +3,7 @@ import { Flame, Droplets, MoreVertical, X } from 'lucide-react';
 import { generateWhatsAppContactLink } from '../utils/whatsapp';
 
 import { createPortal } from 'react-dom';
+import { siteConfig } from '../config';
 
 export function Header() {
   const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -19,7 +20,7 @@ export function Header() {
 
   return (
     <>
-      <header className="fixed top-0 left-0 right-0 z-[100] glass border-b-0 border-white/10 shadow-md">
+      <header className="fixed top-10 left-0 right-0 z-[100] glass border-b-0 border-white/10 shadow-md transition-all">
         <div className="max-w-5xl mx-auto px-4 h-16 flex items-center justify-between">
           
           {/* Mobile Menu Button (Left) */}
@@ -38,7 +39,7 @@ export function Header() {
               <Flame className="w-6 h-6 text-primary" />
               <Droplets className="w-6 h-6 text-blue-400" />
             </div>
-            <span className="text-xl font-bold tracking-tight hidden sm:block md:block">Disk Gás & Água</span>
+            <span className="text-xl font-bold tracking-tight hidden sm:block md:block">{siteConfig.businessName}</span>
           </div>
           
           <nav className="hidden md:flex items-center gap-6 text-sm font-medium text-textMuted">
@@ -90,7 +91,7 @@ export function Header() {
             <div className="p-4 flex items-center justify-between border-b border-white/5">
               <div className="flex items-center gap-2">
                 <Flame className="w-5 h-5 text-primary" />
-                <span className="font-bold text-lg">Disk Gás & Água</span>
+                <span className="font-bold text-lg">{siteConfig.businessName}</span>
               </div>
               <button 
                 onClick={() => setIsMenuOpen(false)}
